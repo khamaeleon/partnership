@@ -18,6 +18,8 @@ import java.io.PrintWriter;
 public class GeoController {
   private final GeoLocationService geoLocationService;
 
+
+
   @GetMapping("/geoLocation")
 //  @ApiOperation(value = "지도 맵 조회")
   public void getMapReportByKeyword(
@@ -56,14 +58,13 @@ public class GeoController {
     }
   }
 
-  @GetMapping("/geoLocation/{targetAddr}/{targetName}")
+  @GetMapping("/geoLocation/{keyword}")
 //  @ApiOperation(value = "지도 맵 조회")
   public void getRegionLocation(
-      @PathVariable(name = "targetAddr") String targetAddr,
-      @PathVariable(name = "targetName") String targetName,
+      @PathVariable(name = "keyword") String keyword,
       HttpServletResponse response) {
 
-    String script = geoLocationService.getResourceByAddress(targetAddr, targetName);
+    String script = geoLocationService.getResourceByAddress(keyword);
 
     try {
       response.setContentType("text/html; charset=utf-8");

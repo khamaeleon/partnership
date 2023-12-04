@@ -26,8 +26,9 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class GeoLocationService {
   private final String KAKAO_APP_KEY = "5a6df184cdd9353147de78f77f079b42";
-  private final String KAKAOMAP_HTML = "templates/dataMap.html";
+  private final String KAKAO_DATA_MAP_HTML = "templates/dataMap.html";
   private final String KAKAOMAP_CATEGORY_HTML = "templates/categoryMap.html";
+  private final String KAKAOMAP_HTML = "templates/kakaoMap.html";
 
   public String getResourceCategoryByKeyword(String keyword) {
     String frame = "";
@@ -47,7 +48,7 @@ public class GeoLocationService {
     String frame = "";
 
     try {
-      InputStream inputStream = new ClassPathResource(KAKAOMAP_HTML).getInputStream();
+      InputStream inputStream = new ClassPathResource(KAKAO_DATA_MAP_HTML).getInputStream();
       frame = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8)
           .replaceAll("#appkey#", KAKAO_APP_KEY)
           .replaceAll("#keyword#", keyword);
@@ -56,20 +57,14 @@ public class GeoLocationService {
     }
     return frame;
   }
-  public String getResourceByAddress(String targetAddr, String targetName) {
+  public String getResourceByAddress(String keyword) {
     String frame = "";
-//    String responseData = Util.httpGetConnection("https://static.trycatch.co.kr/assets/"+KAKAOMAP_HTML,null);
-//
-//    frame = responseData
-//        .replaceAll("#targetAddr#", targetAddr)
-//        .replaceAll("#targetName#", targetName);
 
     try {
       InputStream inputStream = new ClassPathResource(KAKAOMAP_HTML).getInputStream();
       frame = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8)
-          .replaceAll("#appkey#", "b92128e97b1310d95614990c5f17bd5e")
-          .replaceAll("#targetAddr#", targetAddr)
-          .replaceAll("#targetName#", targetName);
+          .replaceAll("#appkey#", KAKAO_APP_KEY)
+          .replaceAll("#keyword#", keyword);
     } catch (NullPointerException | IOException e2) {
       frame = "";
     }
