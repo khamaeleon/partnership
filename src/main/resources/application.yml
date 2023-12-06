@@ -1,8 +1,8 @@
 
 spring:
   thymeleaf:
-    prefix: classpath:/
     suffix: .html
+    prefix: classpath:/
     check-template-location: true
     mode: HTML
     cache: false

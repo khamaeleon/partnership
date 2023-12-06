@@ -24,6 +24,10 @@
       <span class="category_bg mart"></span>
       마트
     </li>
+    <li id="WS1" data-order="2">
+      <span class="category_bg pharmacy"></span>
+      약수터
+    </li>
 
   </ul>
 </div>
@@ -45,7 +49,7 @@
 </script>
 <script>
   $.get(
-      "/data/marker.json",
+      "http://223.130.129.189:9999/api/v1/produce/schema/data/List?userId=ytkim.develop&tableName=outage&pageNumber=1&pageSize=100&transferedDataYn=false",
       function (data) {
         $(data.result).map(function (i, position) {
           // 지도에 표시할 원을 생성합니다
@@ -53,11 +57,11 @@
             center: new kakao.maps.LatLng(position.lat, position.lng),  // 원의 중심좌표 입니다
             radius: 500, // 미터 단위의 원의 반지름입니다
             strokeWeight: 1, // 선의 두께입니다
-            strokeColor: '#f55757', // 선의 색깔입니다
+            strokeColor: '#ff0000', // 선의 색깔입니다
             strokeOpacity: 0, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
             strokeStyle: 'solid', // 선의 스타일 입니다
-            fillColor: '#f55757', // 채우기 색깔입니다
-            fillOpacity: 0.2  // 채우기 불투명도 입니다
+            fillColor: '#ff0000', // 채우기 색깔입니다
+            fillOpacity: 0.4  // 채우기 불투명도 입니다
           });
 
           // 지도에 원을 표시합니다
@@ -108,8 +112,16 @@
 
     // 지도에 표시되고 있는 마커를 제거합니다
     removeMarker();
+    if(currCategory == "WS1"){
 
-    ps.categorySearch(currCategory, placesSearchCB, {useMapBounds: true});
+      $.get(
+          "http://223.130.129.189:9999/api/v1/produce/schema/data/List?userId=ytkim.develop&tableName=mineral_info&pageNumber=1&pageSize=10&transferedDataYn=false",
+          function (data) {
+            transform(data.result);
+          });
+    } else {
+      ps.categorySearch(currCategory, placesSearchCB, {useMapBounds: true});
+    }
   }
 
   // 장소검색이 완료됐을 때 호출되는 콜백함수 입니다
@@ -151,7 +163,7 @@
 
   // 마커를 생성하고 지도 위에 마커를 표시하는 함수입니다
   function addMarker(position, order) {
-    var imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/places_category.png', // 마커 이미지 url, 스프라이트 이미지를 씁니다
+    var imageSrc = 'http://118.67.143.85:8080/img/places_category.png', // 마커 이미지 url, 스프라이트 이미지를 씁니다
         imageSize = new kakao.maps.Size(27, 28),  // 마커 이미지의 크기
         imgOptions = {
           spriteSize: new kakao.maps.Size(72, 208), // 스프라이트 이미지의 크기
@@ -181,8 +193,8 @@
   // 클릭한 마커에 대한 장소 상세정보를 커스텀 오버레이로 표시하는 함수입니다
   function displayPlaceInfo(place) {
     var content = '<div class="placeinfo">' +
-        '   <a class="title" href="' + place.place_url + '" target="_blank" title="'
-        + place.place_name + '">' + place.place_name + '</a>';
+        '   <a class="title" href="' +  place.place_url + '" target="_blank" title="'
+        + place.place_name + '">' + (place.place_name != undefined ? place.place_name : "약수터" ) + '</a>';
 
     if (place.road_address_name) {
       content += '    <span title="' + place.road_address_name + '">' + place.road_address_name
@@ -192,15 +204,40 @@
     } else {
       content += '    <span title="' + place.address_name + '">' + place.address_name + '</span>';
     }
-    content += '    <span title="quantity">' + "구매 가능한 정수량 : " + ' <p class="quantity">'
-        + Math.floor(Math.random() * 30) + '</p></span>';
-    content += '    <span class="tel">' + place.phone + '</span>' +
-        '</div>' +
-        '<div class="after"></div>';
+    content += '    <span title="quantity">';
+    if(place.drink_yn != undefined){
+      content += "음용 가능 여부 : ";
+      if(place.drink_yn){
+        content += ' <p class="quantity" style="color: #0000FF">' +  "가능" + '</p>';
+      } else{
+        content += ' <p class="quantity" style="color: #ff0000">' +  "불가능" + '</p>';
+      }
+    }else {
+      content += "구매 가능한 정수량 : ";
+      content += loadInventoryCnt(place.place_name);
+    }
+    content += '</span>';
+    if(place.phone != undefined){
+      content += '    <span class="tel">' + place.phone + '</span>' +
+          '</div>' +
+          '<div class="after"></div>';
+    }
 
     contentNode.innerHTML = content;
     placeOverlay.setPosition(new kakao.maps.LatLng(place.y, place.x));
     placeOverlay.setMap(map);
+  }
+
+  function loadInventoryCnt(name){
+    var returnVal = '';
+    var data = inventoryList.find((inventory) => name == inventory.inventory_name);
+
+    if(data != undefined && toDay == data.stats_dttm){
+      returnVal = ' <p class="quantity" style="color: #0000FF">' +data.inventory_count + '</p>';
+    } else {
+      returnVal = ' <p class="quantity" style="color: #FF0000">' +'재고 확인중' + '</p>';
+    }
+    return returnVal;
   }
 
   // 각 카테고리에 클릭 이벤트를 등록합니다
@@ -270,6 +307,48 @@
 
     }
   }
+
+  function transform(dataList){
+    var geocoder = new kakao.maps.services.Geocoder();
+    var transList = [];
+    $(dataList).map(function(i, data){
+      var obj = new Object();
+      geocoder.addressSearch(data.address, function(result, status) {
+
+        // 정상적으로 검색이 완료됐으면
+        if (status === kakao.maps.services.Status.OK) {
+          obj.address_name = data.address;
+          obj.x = result[0].x;
+          obj.y = result[0].y;
+          obj.drink_yn = data.drink_yn
+          transList.push(obj);
+          if(dataList.length == transList.length){
+            placesSearchCB(transList, status)
+          }
+        }
+
+      });
+    })
+  }
+</script>
+<script>
+  var inventoryList = [];
+  $.get(
+      "http://223.130.129.189:9999/api/v1/produce/schema/data/List?userId=ytkim.develop&tableName=inventory&pageNumber=1&pageSize=10&transferedDataYn=false",
+      function (data) {
+        inventoryList = data.result;
+      });
+
+
+  function dateFormat(date) {
+    let dateFormat2 = date.getFullYear() + "" +
+        ( (date.getMonth()+1) < 9 ? "0" + (date.getMonth()+1) : (date.getMonth()+1) )+
+        ( (date.getDate()) < 9 ? "0" + (date.getDate()) : (date.getDate()) )
+    ;
+    return dateFormat2;
+  }
+
+  let toDay = dateFormat(new Date());
 </script>
 </body>
 </html>

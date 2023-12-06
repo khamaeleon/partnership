@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container-fluid">
+  <div class="jumbotron">
+    <h2>단수 위기 대응 플랫폼</h2>
+    <p style="font-size: 12pt">단수가 발생된 위치를 기반으로 검색된 위치와 같이 판단해 위기상태를 제공한다.</p>
+  </div>
+  <h3>식수 공급 가능한 위치 찾기.</h3>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="input-group">
+        <input id="input" type="text" class="form-control" placeholder="Search">
+        <div class="input-group-btn">
+          <button class="btn btn-default" type="submit" id="search">
+            <i class="glyphicon glyphicon-search"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <div class="col-md-12">
+      <div id="map" class="tp-50">
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const btn = document.querySelector("#search"),
+      input = document.querySelector("#input"),
+      map = document.querySelector("#map");
+
+  btn.addEventListener("click", function () {
+    map.innerHTML = "";
+    const iframe = document.createElement('iframe');
+    iframe.src = '/api/geoLocation/' + input.value;
+    iframe.width = '100%';
+    iframe.height = '500px';
+    iframe.frameBorder = "0";
+    iframe.marginWidth = "0";
+    iframe.marginHeight = "0";
+    iframe.scrolling = "no";
+    map.appendChild(iframe);
+  })
+
+  input.addEventListener("keyup", function (e) {
+    if(e.keyCode && e.keyCode == 13){
+      e.preventDefault();
+      btn.click();
+    }
+  });
+</script>
+</body>
+</html>

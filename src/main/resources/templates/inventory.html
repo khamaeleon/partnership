@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script type='text/javascript'
+          src='https://dapi.kakao.com/v2/maps/sdk.js?appkey=5a6df184cdd9353147de78f77f079b42&libraries=services,clusterer,drawing'></script>
+</head>
+<body>
+<div class="container">
+  <div class="jumbotron">
+    <h2>단수 위기 대응 플랫폼</h2>
+    <p style="font-size: 12pt">단수가 발생된 위치를 기반으로 검색된 위치와 같이 판단해 위기상태를 제공한다.</p>
+  </div>
+  <h3>식수 재고 수량 등록하기.</h3>
+  <div class="row">
+    <div class="col-md-12">
+      <form>
+        <div class="form-group">
+          <label for="name">지점명:</label>
+          <input type="text" class="form-control" id="name" placeholder="지점명을 입력해 주세요.">
+        </div>
+        <div class="form-group">
+          <label for="count">재고 수량:</label>
+          <input type="text" class="form-control" id="count" placeholder="식수의 재고 수량을 입력해 주세요.">
+        </div>
+        <button type="submit" class="btn btn-default">저장</button>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  const receiptForm = document.querySelector('form');
+
+  var geocoder = new kakao.maps.services.Geocoder();
+
+  const transXY = function(target, name, date){
+    geocoder.addressSearch(target.value, function(result, status) {
+
+      // 정상적으로 검색이 완료됐으면
+      if (status === kakao.maps.services.Status.OK) {
+        postFetch(target.value, result[0].y, result[0].x, name.value, date);
+      }
+    });
+  }
+
+  function postFetch(date, name, count){
+    fetch('http://223.130.129.189:9999/api/v1/input/tool/schema/data/add?tableName=inventory&transferedDataYn=false&userId=ytkim.develop', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        stats_dttm: date,
+        inventory_name: name.value,
+        inventory_count: count.value
+      })
+    })
+    .finally(function (){
+      alert('저장되었습니다.');
+    });
+  }
+
+  function dateFormat(date) {
+    let dateFormat2 = date.getFullYear() + "" +
+        ( (date.getMonth()+1) < 9 ? "0" + (date.getMonth()+1) : (date.getMonth()+1) )+
+        ( (date.getDate()) < 9 ? "0" + (date.getDate()) : (date.getDate()) )
+    ;
+    return dateFormat2;
+  }
+
+  let toDay = dateFormat(new Date());
+
+  receiptForm.addEventListener('submit', event => {
+    event.preventDefault(); // *
+    postFetch(toDay, event.target[0], event.target[1]);
+  });
+</script>
+</body>
+</html>

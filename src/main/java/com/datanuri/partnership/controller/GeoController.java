@@ -18,8 +18,6 @@ import java.io.PrintWriter;
 public class GeoController {
   private final GeoLocationService geoLocationService;
 
-
-
   @GetMapping("/geoLocation")
 //  @ApiOperation(value = "지도 맵 조회")
   public void getMapReportByKeyword(
