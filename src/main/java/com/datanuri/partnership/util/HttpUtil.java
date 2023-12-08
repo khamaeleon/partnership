@@ -36,7 +36,7 @@ public class HttpUtil {
     try {
       //URL 설정
       URL url = new URL(
-          "http://223.130.129.189:9999/api/v1/input/tool/schema/data/add?tableName=mineral_geo_info&transferedDataYn=false&userId=ytkim.develop");
+          "http://223.130.129.189:9999/api/v1/input/tool/schema/data/add?tableName=mineral_info&transferedDataYn=false&userId=ytkim.develop");
 
       conn = (HttpURLConnection) url.openConnection();
 
@@ -53,8 +53,8 @@ public class HttpUtil {
 
       commands.addProperty("address_name", address.get("address_name").toString());
       commands.addProperty("drk_yn", "비음용".equals(drinkYn));
-      commands.addProperty("lat", address.get("lat").toString());
-      commands.addProperty("lng", address.get("lng").toString());
+      commands.addProperty("lat", address.get("y").toString());
+      commands.addProperty("lng", address.get("x").toString());
 
       bw.write(commands.toString());
       bw.flush();
