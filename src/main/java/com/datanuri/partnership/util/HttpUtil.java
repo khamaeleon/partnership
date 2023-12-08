@@ -36,7 +36,7 @@ public class HttpUtil {
     try {
       //URL 설정
       URL url = new URL(
-          "http://223.130.129.189:9999/api/v1/input/tool/schema/data/add?tableName=mineral_info&transferedDataYn=false&userId=ytkim.develop");
+          "http://223.130.129.189:9999/api/v1/input/tool/schema/data/add?tableName=mineral_geo_info&transferedDataYn=false&userId=ytkim.develop");
 
       conn = (HttpURLConnection) url.openConnection();
 
