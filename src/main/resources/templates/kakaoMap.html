@@ -313,8 +313,8 @@
     $(dataList).map(function(i, data){
       var obj = new Object();
           obj.address_name = data.address;
-          obj.x = result[0].x;
-          obj.y = result[0].y;
+          obj.x = data.lng;
+          obj.y = data.lat;
           obj.drink_yn = data.drink_yn
             placesSearchCB(transList, status)
       });
