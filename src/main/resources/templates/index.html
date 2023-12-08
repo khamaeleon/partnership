@@ -39,8 +39,8 @@
 
       <button type="button" class="btn btn-outline-dark btn-lg  d-flex" id="mineral" style="align-items: center">
         약수터 정보 업데이트
-        <div id="load" class="pl-2">
-          <i style="display: none" class="fa fa-spinner fa-spin"></i>
+        <div id="loading" class="pl-2">
+          <i style="display: block" class="fa fa-spinner fa-spin"></i>
         </div>
       </button>
 
@@ -79,8 +79,8 @@
   });
 
   mineral.addEventListener("click", function () {
-    document.getElementById("load").style.display = "block";
-    fetch('/batch/', {
+    document.getElementById("loading").style.display = "block";
+    fetch('/batch/loadApi', {
       method: 'GET',
     })
     .then(response => {
@@ -90,7 +90,7 @@
         alert('데이터가 업데이트 되었습니다.')
       };
 
-      document.getElementById("load").style.display = "none";
+      document.getElementById("loading").style.display = "none";
     })
     .then(data => {
       console.log(data);
