@@ -1,9 +1,9 @@
 package com.datanuri.partnership.util;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -12,6 +12,8 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * create on 2023-12-07. create by IntelliJ IDEA.
@@ -22,18 +24,18 @@ import java.net.URL;
  * @version 1.0
  * @since 1.0
  */
+@Slf4j
 public class HttpUtil {
 
   private static String REST_KEY = "d7648a42fb345572d43002397bc66171";
 
-  public static void saveApi(String address, String drinkYn, String type){
+  public static void saveApi(JsonObject address, String drinkYn, String type){
 
     HttpURLConnection conn = null;
-    JsonObject responseJson = null;
 
     try {
       //URL 설정
-      URL url = new URL("http://223.130.129.189:9999/api/v1/input/tool/schema/data/add?tableName=mineral_info&transferedDataYn=false&userId=ytkim.develop");
+      URL url = new URL("http://223.130.129.189:9999/api/v1/input/tool/schema/data/add?tableName=mineral_geo_info&transferedDataYn=false&userId=ytkim.develop");
 
       conn = (HttpURLConnection) url.openConnection();
 
@@ -48,15 +50,11 @@ public class HttpUtil {
       BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
       // JSON 형식의 데이터 셋팅
       JsonObject commands = new JsonObject();
-      JsonArray jsonArray = new JsonArray();
 
-      commands.addProperty("address", address);
-      commands.addProperty("drink_yn", "비음용".equals(drinkYn));
-      // JSON 형식의 데이터 셋팅 끝
-
-      // 데이터를 STRING으로 변경
-      Gson gson = new GsonBuilder().setPrettyPrinting().create();
-      String jsonOutput = gson.toJson(commands);
+      commands.addProperty("address_name", address.get("address_name").toString());
+      commands.addProperty("drk_yn", "비음용".equals(drinkYn));
+      commands.addProperty("lat", address.get("lat").toString());
+      commands.addProperty("lng", address.get("lng").toString());
 
       bw.write(commands.toString());
       bw.flush();
@@ -71,9 +69,6 @@ public class HttpUtil {
         while ((line = br.readLine()) != null) {
           sb.append(line);
         }
-
-        // 응답 데이터
-        System.out.println("responseJson :: " + sb.toString());
       }
     } catch (MalformedURLException e) {
       e.printStackTrace();
@@ -85,14 +80,17 @@ public class HttpUtil {
   }
 
 
-  public static void retrievelatlng(String address){
-
-    HttpURLConnection conn = null;
-    JsonObject responseJson = null;
-
+  public static JsonObject retrieveLatlng(String address){
+    JsonObject obj = null;
     try {
+      HttpURLConnection conn = null;
+
+      String charset = "UTF-8";
+
+      String query = String.format("query=%s",
+          URLEncoder.encode(address, charset));
       //URL 설정
-      URL url = new URL("https://dapi.kakao.com/v2/local/search/address.json");
+      URL url = new URL("https://dapi.kakao.com/v2/local/search/address.json" + "?" + query);
 
       conn = (HttpURLConnection) url.openConnection();
 
@@ -102,23 +100,13 @@ public class HttpUtil {
       conn.setRequestProperty("Content-Type", "application/json");
       conn.setRequestProperty("Transfer-Encoding", "chunked");
       conn.setRequestProperty("Connection", "keep-alive");
+      conn.setRequestProperty("Accept-Charset", charset);
 
       conn.setDoOutput(true);
 
-
       BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
-      // JSON 형식의 데이터 셋팅
-      JsonObject commands = new JsonObject();
-      JsonArray jsonArray = new JsonArray();
 
-      commands.addProperty("query", address);
-      // JSON 형식의 데이터 셋팅 끝
-
-      // 데이터를 STRING으로 변경
-      Gson gson = new GsonBuilder().setPrettyPrinting().create();
-      String jsonOutput = gson.toJson(commands);
-
-      bw.write(commands.toString());
+      bw.write("{query:"+address+"}");
       bw.flush();
       bw.close();
 
@@ -132,9 +120,16 @@ public class HttpUtil {
           sb.append(line);
         }
 
-        // 응답 데이터
-        System.out.println("responseJson :: " + sb.toString());
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = (JsonObject) jsonParser.parse(sb.toString());
+        JsonArray jsonDocuments = (JsonArray) jsonObject.get("documents");
+
+        for(JsonElement jsonElement : jsonDocuments){
+          obj = jsonElement.getAsJsonObject();
+          log.info("address:{}, lng:{}, lat:{}", obj.get("address_name"), obj.get("x"), obj.get("y"));
+        }
       }
+      return obj;
     } catch (MalformedURLException e) {
       e.printStackTrace();
     } catch (IOException e) {

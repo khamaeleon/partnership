@@ -6,3 +6,7 @@ spring:
     check-template-location: true
     mode: HTML
     cache: false
+
+  logging:
+    level:
+      root: debug

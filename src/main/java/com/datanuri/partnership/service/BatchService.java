@@ -21,8 +21,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @Service
@@ -35,6 +33,7 @@ public class BatchService {
   public void loadApi() {
 
     try {
+      long startTime = System.currentTimeMillis();
       DocumentBuilderFactory dbFactoty = DocumentBuilderFactory.newInstance();
       DocumentBuilder dBuilder = dbFactoty.newDocumentBuilder();
       Document doc = dBuilder.parse(API_URL);
@@ -49,21 +48,22 @@ public class BatchService {
       for (int j = 0; j < childNodes.getLength(); ++j) {
         if ("row".equals(childNodes.item(j).getNodeName())) {
           NodeList dataNode = childNodes.item(j).getChildNodes();
-          JsonObject jsonObject = new JsonObject();
           String address = "";
           String drinkYn = "";
+          JsonObject transAddress = null;
           for (int i = 0; i < dataNode.getLength(); ++i) {
             if ("ADDR".equals(dataNode.item(i).getNodeName())) {
               address = dataNode.item(i).getTextContent();
-              HttpUtil.retrievelatlng(address);
+              transAddress = HttpUtil.retrieveLatlng(address);
             } else if ("DKPS_YN_NM".equals(dataNode.item(i).getNodeName())) {
               drinkYn = dataNode.item(i).getTextContent();
             }
           }
-          HttpUtil.saveApi(address, drinkYn, "PUT");
+          HttpUtil.saveApi(transAddress, drinkYn, "PUT");
         }
       }
-
+      long endTime = System.currentTimeMillis();
+      log.debug("size: {}, time: {}ms",nList.getLength(), endTime-startTime);
     } catch (Exception e) {
       log.debug(e.getMessage());
     }

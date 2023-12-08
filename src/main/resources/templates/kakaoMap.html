@@ -49,7 +49,7 @@
 </script>
 <script>
   $.get(
-      "http://223.130.129.189:9999/api/v1/produce/schema/data/List?userId=ytkim.develop&tableName=outage&pageNumber=1&pageSize=100&transferedDataYn=false",
+      "http://223.130.129.189:9999/api/v1/produce/schema/data/List?userId=ytkim.develop&tableName=outage&pageNumber=1&pageSize=1000&transferedDataYn=false",
       function (data) {
         $(data.result).map(function (i, position) {
           // 지도에 표시할 원을 생성합니다
@@ -115,7 +115,7 @@
     if(currCategory == "WS1"){
 
       $.get(
-          "http://223.130.129.189:9999/api/v1/produce/schema/data/List?userId=ytkim.develop&tableName=mineral_info&pageNumber=1&pageSize=10&transferedDataYn=false",
+          "http://223.130.129.189:9999/api/v1/produce/schema/data/List?userId=ytkim.develop&tableName=mineral_geo_info&pageNumber=1&pageSize=100&transferedDataYn=false",
           function (data) {
             transform(data.result);
           });
@@ -334,7 +334,7 @@
 <script>
   var inventoryList = [];
   $.get(
-      "http://223.130.129.189:9999/api/v1/produce/schema/data/List?userId=ytkim.develop&tableName=inventory&pageNumber=1&pageSize=10&transferedDataYn=false",
+      "http://223.130.129.189:9999/api/v1/produce/schema/data/List?userId=ytkim.develop&tableName=inventory&pageNumber=1&pageSize=100&transferedDataYn=false",
       function (data) {
         inventoryList = data.result;
       });
