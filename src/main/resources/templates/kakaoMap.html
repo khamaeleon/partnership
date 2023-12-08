@@ -309,26 +309,15 @@
   }
 
   function transform(dataList){
-    var geocoder = new kakao.maps.services.Geocoder();
     var transList = [];
     $(dataList).map(function(i, data){
       var obj = new Object();
-      geocoder.addressSearch(data.address, function(result, status) {
-
-        // 정상적으로 검색이 완료됐으면
-        if (status === kakao.maps.services.Status.OK) {
           obj.address_name = data.address;
           obj.x = result[0].x;
           obj.y = result[0].y;
           obj.drink_yn = data.drink_yn
-          transList.push(obj);
-          if(dataList.length == transList.length){
             placesSearchCB(transList, status)
-          }
-        }
-
       });
-    })
   }
 </script>
 <script>

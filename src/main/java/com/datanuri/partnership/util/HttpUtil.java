@@ -51,10 +51,10 @@ public class HttpUtil {
       // JSON 형식의 데이터 셋팅
       JsonObject commands = new JsonObject();
 
-      commands.addProperty("address_name", address.get("address_name").toString());
+      commands.addProperty("address_name", address.get("address_name").getAsString());
       commands.addProperty("drk_yn", "비음용".equals(drinkYn));
-      commands.addProperty("lat", address.get("y").toString());
-      commands.addProperty("lng", address.get("x").toString());
+      commands.addProperty("lat", address.get("y").getAsString());
+      commands.addProperty("lng", address.get("x").getAsString());
 
       bw.write(commands.toString());
       bw.flush();
