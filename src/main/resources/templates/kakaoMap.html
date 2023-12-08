@@ -309,15 +309,15 @@
   }
 
   function transform(dataList){
-    var transList = [];
-    $(dataList).map(function(i, data){
+    var transList = $(dataList).map(function(i, data){
       var obj = new Object();
-          obj.address_name = data.address;
+          obj.address_name = data.address_name;
           obj.x = data.lng;
           obj.y = data.lat;
-          obj.drink_yn = data.drink_yn
-            placesSearchCB(transList, status)
+          obj.drink_yn = data.drk_yn
+      return obj;
       });
+    placesSearchCB(transList, "OK")
   }
 </script>
 <script>
