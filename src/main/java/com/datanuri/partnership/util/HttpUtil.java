@@ -29,13 +29,14 @@ public class HttpUtil {
 
   private static String REST_KEY = "d7648a42fb345572d43002397bc66171";
 
-  public static void saveApi(JsonObject address, String drinkYn, String type){
+  public static void saveApi(JsonObject address, String drinkYn, String type) {
 
     HttpURLConnection conn = null;
 
     try {
       //URL 설정
-      URL url = new URL("http://223.130.129.189:9999/api/v1/input/tool/schema/data/add?tableName=mineral_geo_info&transferedDataYn=false&userId=ytkim.develop");
+      URL url = new URL(
+          "http://223.130.129.189:9999/api/v1/input/tool/schema/data/add?tableName=mineral_geo_info&transferedDataYn=false&userId=ytkim.develop");
 
       conn = (HttpURLConnection) url.openConnection();
 
@@ -45,7 +46,6 @@ public class HttpUtil {
       conn.setRequestProperty("Transfer-Encoding", "chunked");
       conn.setRequestProperty("Connection", "keep-alive");
       conn.setDoOutput(true);
-
 
       BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
       // JSON 형식의 데이터 셋팅
@@ -80,7 +80,7 @@ public class HttpUtil {
   }
 
 
-  public static JsonObject retrieveLatlng(String address){
+  public static JsonObject retrieveLatlng(String address) {
     JsonObject obj = null;
     try {
       HttpURLConnection conn = null;
@@ -96,7 +96,7 @@ public class HttpUtil {
 
       // type의 경우 POST, GET, PUT, DELETE 가능
       conn.setRequestMethod("GET");
-      conn.setRequestProperty("Authorization","KakaoAK " + REST_KEY);
+      conn.setRequestProperty("Authorization", "KakaoAK " + REST_KEY);
       conn.setRequestProperty("Content-Type", "application/json");
       conn.setRequestProperty("Transfer-Encoding", "chunked");
       conn.setRequestProperty("Connection", "keep-alive");
@@ -106,7 +106,7 @@ public class HttpUtil {
 
       BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
 
-      bw.write("{query:"+address+"}");
+      bw.write("{query:" + address + "}");
       bw.flush();
       bw.close();
 
@@ -124,12 +124,12 @@ public class HttpUtil {
         JsonObject jsonObject = (JsonObject) jsonParser.parse(sb.toString());
         JsonArray jsonDocuments = (JsonArray) jsonObject.get("documents");
 
-        for(JsonElement jsonElement : jsonDocuments){
+        for (JsonElement jsonElement : jsonDocuments) {
           obj = jsonElement.getAsJsonObject();
-          log.info("address:{}, lng:{}, lat:{}", obj.get("address_name"), obj.get("x"), obj.get("y"));
+          log.info("address:{}, lng:{}, lat:{}", obj.get("address_name"), obj.get("x"),
+              obj.get("y"));
         }
       }
-      return obj;
     } catch (MalformedURLException e) {
       e.printStackTrace();
     } catch (IOException e) {
@@ -137,6 +137,7 @@ public class HttpUtil {
     } catch (Exception e) {
       System.out.println("not JSON Format response");
     }
+    return obj;
   }
 }
 
