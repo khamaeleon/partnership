@@ -86,10 +86,11 @@
   $.get(
       "http://223.130.129.189:9999/api/v1/produce/schema/data/List?userId=ytkim.develop&tableName=mineral_info&pageNumber=1&pageSize=1000&transferedDataYn=false",
       function (data) {
-        var table = document.getElementById("mineralList");
+        var table = document.getElementById("mineralList").getElementsByTagName("tbody")[0];
+        table.innerHTML = "";
         $(data.result).map(function (i, position) {
 
-          var row = table.insertRow(i+1);
+          var row = table.insertRow(i);
           var cell1 = row.insertCell(0);
           var cell2 = row.insertCell(1);
 
