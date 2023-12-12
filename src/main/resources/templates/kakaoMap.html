@@ -335,7 +335,12 @@
   $.get(
       "http://223.130.129.189:9999/api/v1/produce/schema/data/List?userId=ytkim.develop&tableName=inventory&pageNumber=1&pageSize=100&transferedDataYn=false",
       function (data) {
-        inventoryList = data.result;
+        if(data != null && data.result.length != 0) {
+          inventoryList = data.result.sort((a, b) => {
+            if (a.stats_dttm > b.stats_dttm) return -1;
+            else if (a.stats_dttm < b.stats_dttm) return 1;
+          })
+        }
       });
 
 
