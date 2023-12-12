@@ -24,5 +24,4 @@ public class PartnershipController {
     return "/index";
   }
 
-
 }

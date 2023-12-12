@@ -115,7 +115,7 @@
     if(currCategory == "WS1"){
 
       $.get(
-          "http://223.130.129.189:9999/api/v1/produce/schema/data/List?userId=ytkim.develop&tableName=mineral_geo_info&pageNumber=1&pageSize=1000&transferedDataYn=false",
+          "http://223.130.129.189:9999/api/v1/produce/schema/data/List?userId=ytkim.develop&tableName=mineral_info&pageNumber=1&pageSize=1000&transferedDataYn=false",
           function (data) {
             transform(data.result);
           });
@@ -232,12 +232,16 @@
     placeOverlay.setMap(map);
   }
 
+  function strtoDateFormat(date){
+    return date.substring(0,4) + '.' + date.substring(4,6) + '.' + date.substring(6,8);
+  }
+
   function loadInventoryCnt(name){
     var returnVal = '';
     var data = inventoryList.find((inventory) => name == inventory.inventory_name);
 
     if(data != undefined && toDay == data.stats_dttm){
-      returnVal = ' <p class="quantity" style="color: #0000FF">' +data.inventory_count + '</p>';
+      returnVal = ' <p class="quantity" style="color: #0000FF">' +data.inventory_count + '</p>' + '<p>' +'(' + strtoDateFormat(data.stats_dttm) + ')'+'</p>';
     } else {
       returnVal = ' <p class="quantity" style="color: #FF0000">' +'재고 확인중' + '</p>';
     }
@@ -291,8 +295,10 @@
   //키워드 검색
   // 장소 검색 객체를 생성합니다
   var ps = new kakao.maps.services.Places(map);
-
-  ps.keywordSearch('#keyword#', placesSearchCB2);
+  var keyword = '#keyword#';
+  if(keyword != 'default'){
+    ps.keywordSearch(keyword, placesSearchCB2);
+  }
 
   // 장소검색이 완료됐을 때 호출되는 콜백함수 입니다
   function placesSearchCB2(data, status, pagination) {

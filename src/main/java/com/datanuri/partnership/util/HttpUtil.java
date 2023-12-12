@@ -26,8 +26,45 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class HttpUtil {
-
   private static String REST_KEY = "d7648a42fb345572d43002397bc66171";
+
+  public static String getApi(String type) {
+
+    HttpURLConnection conn = null;
+    String returnVal = null;
+    try {
+      //URL 설정
+      URL url = new URL(
+          "http://223.130.129.189:9999/api/v1/produce/schema/data/List?userId=ytkim.develop&tableName=mineral_info&pageNumber=1&pageSize=10000&transferedDataYn=false");
+
+      conn = (HttpURLConnection) url.openConnection();
+
+      // type의 경우 POST, GET, PUT, DELETE 가능
+      conn.setRequestMethod(type);
+      conn.setRequestProperty("Content-Type", "application/json");
+      conn.setRequestProperty("Connection", "keep-alive");
+      conn.setDoOutput(false);
+
+      // 보내고 결과값 받기
+      int responseCode = conn.getResponseCode();
+      if (responseCode == 200) {
+        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line = "";
+        while ((line = br.readLine()) != null) {
+          sb.append(line);
+        }
+        returnVal = sb.toString();
+      }
+    } catch (MalformedURLException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (Exception e) {
+      System.out.println("not JSON Format response");
+    }
+    return returnVal;
+  }
 
   public static void saveApi(JsonObject address, String drinkYn, String type) {
 
@@ -35,8 +72,7 @@ public class HttpUtil {
 
     try {
       //URL 설정
-      URL url = new URL(
-          "http://223.130.129.189:9999/api/v1/input/tool/schema/data/add?tableName=mineral_geo_info&transferedDataYn=false&userId=ytkim.develop");
+      URL url = new URL("http://223.130.129.189:9999/api/v1/input/tool/schema/data/add?tableName=mineral_info&transferedDataYn=false&userId=ytkim.develop");
 
       conn = (HttpURLConnection) url.openConnection();
 
@@ -126,6 +162,7 @@ public class HttpUtil {
 
         for (JsonElement jsonElement : jsonDocuments) {
           obj = jsonElement.getAsJsonObject();
+          obj.addProperty("address_name", address);
           log.info("address:{}, lng:{}, lat:{}", obj.get("address_name"), obj.get("x"),
               obj.get("y"));
         }

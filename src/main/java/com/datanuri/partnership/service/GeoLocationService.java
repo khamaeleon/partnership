@@ -26,37 +26,7 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class GeoLocationService {
   private final String KAKAO_APP_KEY = "5a6df184cdd9353147de78f77f079b42";
-  private final String KAKAO_DATA_MAP_HTML = "templates/dataMap.html";
-  private final String KAKAOMAP_CATEGORY_HTML = "templates/categoryMap.html";
   private final String KAKAOMAP_HTML = "templates/kakaoMap.html";
-
-  public String getResourceCategoryByKeyword(String keyword) {
-    String frame = "";
-
-    try {
-      InputStream inputStream = new ClassPathResource(KAKAOMAP_CATEGORY_HTML).getInputStream();
-      frame = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8)
-          .replaceAll("#appkey#", KAKAO_APP_KEY)
-          .replaceAll("#keyword#", keyword);
-    } catch (NullPointerException | IOException e2) {
-      frame = "";
-    }
-    return frame;
-  }
-
-  public String getResourceByKeyword(String keyword) {
-    String frame = "";
-
-    try {
-      InputStream inputStream = new ClassPathResource(KAKAO_DATA_MAP_HTML).getInputStream();
-      frame = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8)
-          .replaceAll("#appkey#", KAKAO_APP_KEY)
-          .replaceAll("#keyword#", keyword);
-    } catch (NullPointerException | IOException e2) {
-      frame = "";
-    }
-    return frame;
-  }
   public String getResourceByAddress(String keyword) {
     String frame = "";
 

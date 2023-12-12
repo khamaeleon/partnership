@@ -14,7 +14,11 @@
 package com.datanuri.partnership.service;
 
 import com.datanuri.partnership.util.HttpUtil;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.util.Iterator;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +35,7 @@ public class BatchService {
   private final String API_URL = "http://223.130.129.189:9191/I2400";
 
   public void loadApi() {
+    String response = HttpUtil.getApi("GET");
 
     try {
       long startTime = System.currentTimeMillis();
@@ -54,12 +59,29 @@ public class BatchService {
           for (int i = 0; i < dataNode.getLength(); ++i) {
             if ("ADDR".equals(dataNode.item(i).getNodeName())) {
               address = dataNode.item(i).getTextContent();
-              transAddress = HttpUtil.retrieveLatlng(address);
             } else if ("DKPS_YN_NM".equals(dataNode.item(i).getNodeName())) {
               drinkYn = dataNode.item(i).getTextContent();
             }
           }
-          HttpUtil.saveApi(transAddress, drinkYn, "PUT");
+
+          JsonObject jsonObject = (JsonObject) JsonParser.parseString(response);
+          JsonArray jsonArray = (JsonArray) jsonObject.get("result");
+          Iterator<JsonElement> it = jsonArray.iterator();
+
+          boolean saveYn = true;
+          while(it.hasNext()){
+            JsonObject obj = it.next().getAsJsonObject();
+            if(obj.get("address_name").getAsString().equals(address)){
+              saveYn = false;
+              break;
+            }
+          }
+          if(saveYn){
+            transAddress = HttpUtil.retrieveLatlng(address);
+            if(transAddress != null){
+              HttpUtil.saveApi(transAddress, drinkYn, "PUT");
+            }
+          }
         }
       }
       long endTime = System.currentTimeMillis();

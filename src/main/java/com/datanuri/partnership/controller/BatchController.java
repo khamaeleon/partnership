@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/batch")
 public class BatchController {
-
   private final BatchService batchservice;
 
   @GetMapping("/loadApi")
